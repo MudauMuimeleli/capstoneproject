@@ -1,131 +1,117 @@
-""" Mock API Exercise: Music Album
-1. Create an "Album" resource on mockapi.io ("id", "name", "rate").
+"""Mock API Exercise: Music Album
+
+1. Create an "Album" resource on mockapi.io (fields: id, name, rate).
 2. Paste its URL into API_ENDPOINT below.
 3. Study the finished GET section.
-4. Fill in the POST, PUT, DELETE TODOs. Keep the TODO comments.
+4. Complete the POST, PUT, and DELETE sections.
 """
+
 import requests
 
-# TODO (SETUP): Replace this placeholder with your own mockapi.io
-# resource URL, e.g. "https://<your-project-id>.mockapi.io/album/<AlbumName>"
-API_ENDPOINT = "https://mockapi.io"
+# TODO (SETUP): Replace this placeholder with your own mockapi.io resource URL.
+# Example: "https://<your-project-id>.mockapi.io/album"
+API_ENDPOINT = "https://<your-project-id>.mockapi.io/album"
+
 
 # ============================================================
 # 1. GET METHOD (worked example, given to you)
 # ============================================================
 try:
-    getAllSongs = requests.get(API_ENDPOINT)
-    getAllSongs.raise_for_status()
-    print("Status Code: ", getAllSongs.status_code)
-    
-    # CRITICAL FIX: If your online mockapi database has 0 items, 
-    # it returns empty text which causes the JSON crash. 
-    # This check safely prevents the crash.
-    if getAllSongs.text.strip():
-        responseOfAllSongs = getAllSongs.json()
+    response = requests.get(API_ENDPOINT)
+    response.raise_for_status()
+    print("Status Code: ", response.status_code)
+
+    # Safe handling in case the mock API has no records yet.
+    if response.text.strip():
+        albums = response.json()
     else:
-        responseOfAllSongs = []
-        
-    print("Album Songs: ", responseOfAllSongs)
+        albums = []
+
+    print("Album Songs: ", albums)
     print("\n")
 
-    print("***************Print 1 song*****************************")
-    getOneSong = requests.get(API_ENDPOINT + "/1")
-    print("Status Code", getOneSong.status_code)
-    
-    if getOneSong.status_code == 200 and getOneSong.text.strip():
-        responseOneSong = getOneSong.json()["name"]
-        getRating = getOneSong.json()["rate"]
-    else:
-        responseOneSong = "No songs exist yet"
-        getRating = "0"
-        
-    print("Get one song: ", responseOneSong)
-    print("\n")
-    print("Get rating: ", getRating)
+    print("*************** Print 1 song *****************************")
+    single_response = requests.get(API_ENDPOINT + "/1")
+    print("Status Code: ", single_response.status_code)
 
-except requests.exceptions.HTTPError as httperror:
-    print("HTTP GET ERROR: ", httperror)
+    if single_response.status_code == 200 and single_response.text.strip():
+        song_name = single_response.json().get("name", "No name")
+        song_rating = single_response.json().get("rate", "0")
+    else:
+        song_name = "No songs exist yet"
+        song_rating = "0"
+
+    print("Get one song: ", song_name)
+    print("\n")
+    print("Get rating: ", song_rating)
+
+except requests.exceptions.RequestException as error:
+    print("HTTP GET ERROR: ", error)
+
 
 # ============================================================
 # 2. POST METHOD
 # ============================================================
 print("\n")
 print("--- CREATING A NEW SONG ---")
-# TODO (POST):
-# 1. Build dict newSong: "id", "name", "rating" (strings), e.g. "4", "<title>", "8".
-# 2. try/except requests.exceptions.HTTPError:
-# 3. POST API_ENDPOINT, json=newSong -> responseOfNewSong.
-# 4. print responseOfNewSong.status_code (expect 201).
-# 5. responseOfNewSong.raise_for_status()
-# 6. print responseOfNewSong.json()
-# Write your POST code here:
 try:
-    newSong = {
+    new_song = {
         "id": "4",
         "name": "Sondela",
         "rate": "9"
     }
-    responseOfNewSong = requests.post(API_ENDPOINT, json=newSong)
-    print("Status Code: ", responseOfNewSong.status_code)
-    responseOfNewSong.raise_for_status()
-    if responseOfNewSong.text.strip():
-        print(responseOfNewSong.json())
-except requests.exceptions.HTTPError as httperror:
-    print("HTTP POST ERROR: ", httperror)
+
+    response_of_new_song = requests.post(API_ENDPOINT, json=new_song)
+    print("Status Code: ", response_of_new_song.status_code)
+    response_of_new_song.raise_for_status()
+
+    if response_of_new_song.text.strip():
+        print(response_of_new_song.json())
+
+except requests.exceptions.RequestException as error:
+    print("HTTP POST ERROR: ", error)
+
 
 # ============================================================
 # 3. PUT METHOD
 # ============================================================
 print("\n")
 print("--- REPLACING A SONG ---")
-# TODO (PUT):
-# 1. Build dict updatedSong: "id", "name", "rate" (strings), e.g. "2", "<title>", "7".
-# 2. try/except requests.exceptions.HTTPError:
-# 3. PUT API_ENDPOINT + "/2" (the id), json=updatedSong -> responseOfReplacement.
-# 4. print responseOfReplacement.status_code.
-# 5. responseOfReplacement.raise_for_status()
-# 6. print responseOfReplacement.json()
-# Write your PUT code here:
 try:
-    updatedSong = {
+    updated_song = {
         "id": "2",
         "name": "Sondela Remix",
         "rate": "10"
     }
-    # Using /4 since we created item 4 above to ensure it hits a valid ID
-    responseOfReplacement = requests.put(API_ENDPOINT + "/4", json=updatedSong)
-    print("Status Code: ", responseOfReplacement.status_code)
-    responseOfReplacement.raise_for_status()
-    if responseOfReplacement.text.strip():
-        print(responseOfReplacement.json())
-except requests.exceptions.HTTPError as httperror:
-    print("HTTP PUT ERROR: ", httperror)
+
+    # Update an existing item by its ID.
+    response_of_replacement = requests.put(API_ENDPOINT + "/2", json=updated_song)
+    print("Status Code: ", response_of_replacement.status_code)
+    response_of_replacement.raise_for_status()
+
+    if response_of_replacement.text.strip():
+        print(response_of_replacement.json())
+
+except requests.exceptions.RequestException as error:
+    print("HTTP PUT ERROR: ", error)
+
 
 # ============================================================
 # 4. DELETE METHOD
 # ============================================================
 print("\n")
 print("--- DELETING A SONG ---")
-# TODO (DELETE):
-# 1. try/except requests.exceptions.HTTPError:
-# 2. DELETE API_ENDPOINT + "/3" (a chosen id) -> deleteSong.
-# 3. print deleteSong.status_code.
-# 4. deleteSong.raise_for_status()
-# 5. print deleteSong.json()
-# 6. Bonus: GET that same id, confirm it now errors.
-# Write your DELETE code here:
 try:
-    # Deleting the item we created to verify the method works flawlessly
-    deleteSong = requests.delete(API_ENDPOINT + "/4")
-    print("Status Code: ", deleteSong.status_code)
-    deleteSong.raise_for_status()
-    if deleteSong.text.strip():
-        print(deleteSong.json())
+    delete_song = requests.delete(API_ENDPOINT + "/4")
+    print("Status Code: ", delete_song.status_code)
+    delete_song.raise_for_status()
+
+    if delete_song.text.strip():
+        print(delete_song.json())
 
     print("--- Bonus: Verifying deletion errors out as expected ---")
-    confirmCheck = requests.get(API_ENDPOINT + "/4")
-    confirmCheck.raise_for_status()
-except requests.exceptions.HTTPError as httperror:
-    print("HTTP Error (Expected confirmation result): ", httperror)
+    confirm_check = requests.get(API_ENDPOINT + "/4")
+    confirm_check.raise_for_status()
 
+except requests.exceptions.RequestException as error:
+    print("HTTP Error (Expected confirmation result): ", error)
