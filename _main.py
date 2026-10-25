@@ -8,9 +8,8 @@
 
 import requests
 
-# TODO (SETUP): Replace this placeholder with your own mockapi.io resource URL.
-# Example: "https://<your-project-id>.mockapi.io/album"
-API_ENDPOINT = "https://<your-project-id>.mockapi.io/album"
+# Updated to the mockapi.io album resource for this project.
+API_ENDPOINT = "https://6adde1044e88f1bba4a4c56f.mockapi.io/album"
 
 
 # ============================================================
